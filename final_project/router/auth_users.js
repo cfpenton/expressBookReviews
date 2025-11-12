@@ -5,7 +5,6 @@ const regd_users = express.Router();
 
 let users = [];
 
-// Check if username is valid (exists in users array)
 const isValid = (username) => {
   return users.some(user => user.username === username);
 };
@@ -19,17 +18,13 @@ const authenticatedUser = (username, password) => {
 regd_users.post("/login", (req,res) => {
  const { username, password } = req.body;
 
-  // Validate username and password presence
   if (!username || !password) {
     return res.status(400).json({ message: "Username and password are required" });
   }
 
-  // Check if user exists and credentials match
   if (authenticatedUser(username, password)) {
-    // Create JWT token
     const token = jwt.sign({ username: username }, "access", { expiresIn: "1h" });
 
-    // Save token and username in session
     req.session.authorization = {
       accessToken: token,
       username: username
@@ -44,8 +39,8 @@ regd_users.post("/login", (req,res) => {
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
     const isbn = req.params.isbn;
-    const review = req.query.review; // review comes from query string
-    const username = req.session.authorization?.username; // get logged-in username
+    const review = req.query.review;
+    const username = req.session.authorization?.username;
   
     if (!username) {
       return res.status(403).json({ message: "User not logged in" });
@@ -77,7 +72,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 // Delete a book review
 regd_users.delete("/auth/review/:isbn", (req, res) => {
     const isbn = req.params.isbn;
-    const username = req.session.authorization?.username; // logged-in username
+    const username = req.session.authorization?.username;
   
     if (!username) {
       return res.status(403).json({ message: "User not logged in" });
